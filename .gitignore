@@ -1,2 +1,11 @@
 # production
 /docs_local
+/Laravel
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
