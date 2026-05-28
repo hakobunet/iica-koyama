@@ -87,14 +87,15 @@ INFO:     Uvicorn running on http://127.0.0.1:8000
 INFO:     Application startup complete.
 ```
 
----
-
-## アクセス先
+**④ ブラウザで以下の URL を開く**
 
 | URL | 内容 |
 |-----|------|
 | http://localhost:8000 | タスク管理アプリ（画面） |
 | http://localhost:8000/docs | Swagger UI（API テスト画面） |
+
+> サーバーを**起動したままにした状態**でブラウザを開いてください。
+> ターミナルを閉じるとサーバーが止まり、画面も表示されなくなります。
 
 ---
 
