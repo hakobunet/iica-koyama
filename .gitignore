@@ -1,6 +1,8 @@
 # production
 /docs_local
 /Laravel
+/React-app
+/school-frontend
 
 # Python
 venv/
