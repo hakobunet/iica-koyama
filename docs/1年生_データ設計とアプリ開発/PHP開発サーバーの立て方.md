@@ -31,6 +31,7 @@ http://localhost:8000/index.php
 ```
 study/
   index.php
+  contact.php
   01-basics/
     1-1.php
     1-2.php
