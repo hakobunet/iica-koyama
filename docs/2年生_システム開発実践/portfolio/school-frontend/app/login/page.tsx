@@ -16,7 +16,7 @@ export default function LoginPage() {
     setLoading(true);
 
     // ★ コマ16との違い：固定値チェック → 本物のAPIを呼ぶ
-    const res = await fetch("http://localhost:8000/api/login", {
+    const res = await fetch("http://127.0.0.1:8000/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

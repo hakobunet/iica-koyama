@@ -30,7 +30,7 @@ export default function StudentsPage() {
   async function loadStudents(token) {
     setLoading(true);
 
-    const res = await fetch("http://localhost:8000/api/students", {
+    const res = await fetch("http://127.0.0.1:8000/api/students", {
       headers: {
         "Accept": "application/json",
         "Authorization": `Bearer ${token}`, // ★ トークンをヘッダーに付ける
@@ -53,7 +53,7 @@ export default function StudentsPage() {
     const token = localStorage.getItem("token");
     setAddError(""); // ← エラーをリセット
 
-    const res = await fetch("http://localhost:8000/api/students", {
+    const res = await fetch("http://127.0.0.1:8000/api/students", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export default function StudentsPage() {
   async function handleDelete(id) {
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`http://localhost:8000/api/students/${id}`, {
+    const res = await fetch(`http://127.0.0.1:8000/api/students/${id}`, {
       method: "DELETE",
       headers: {
         "Accept": "application/json",
@@ -98,7 +98,7 @@ export default function StudentsPage() {
   async function handleLogout() {
     const token = localStorage.getItem("token");
 
-    await fetch("http://localhost:8000/api/logout", {
+    await fetch("http://127.0.0.1:8000/api/logout", {
       method: "POST",
       headers: {
         "Accept": "application/json",
