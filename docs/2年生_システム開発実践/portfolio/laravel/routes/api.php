@@ -26,4 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::apiResource('students', StudentController::class);
+    
+    // 例：一覧取得(index)と詳細取得(show)だけを有効にする場合
+    // Route::apiResource('students', StudentController::class)->only(['index', 'show']);
 });
