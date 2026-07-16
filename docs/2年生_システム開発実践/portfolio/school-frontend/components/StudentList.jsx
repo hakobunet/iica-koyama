@@ -1,3 +1,7 @@
+// ▼ StudentList.tsx の先頭に追加
+"use client";
+
+import Link from "next/link";
 // StudentList：生徒一覧テーブル全体
 // students = 生徒データの配列（親から渡ってくる）
 // onDelete = 削除ボタンを押したときに呼ぶ関数（親から渡ってくる）
@@ -59,12 +63,17 @@ function StudentRow({ student, onDelete }) {
       <td style={tdStyle}>{student.email}</td>
       <td style={tdStyle}>{student.score}</td>
       <td style={tdStyle}>
+      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+        <Link href={`/students/${student.id}`} style={detailLinkStyle}>
+          詳細
+        </Link>
         <button
           onClick={handleDelete}
           style={{ background: "#D32F2F", color: "white", border: "none", borderRadius: "4px", padding: "4px 12px", cursor: "pointer", fontSize: "0.85em" }}
         >
           削除
         </button>
+        </div >
       </td>
     </tr>
   );
@@ -73,5 +82,20 @@ function StudentRow({ student, onDelete }) {
 // スタイル定数（繰り返し使う style をまとめる）
 const thStyle = { padding: "10px 16px", textAlign: "left", fontWeight: "bold", fontSize: "0.9em" };
 const tdStyle = { padding: "12px 16px", fontSize: "0.95em" };
+
+const detailLinkStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  minWidth: 104,
+  padding: "0.85rem 1.25rem",
+  borderRadius: 999,
+  background: "#163D7A",
+  color: "#fff",
+  fontWeight: 700,
+  fontSize: "0.95rem",
+  letterSpacing: "0.01em",
+  boxShadow: "0 10px 24px rgba(22, 61, 122, 0.18)",
+};
 
 export default StudentList;
