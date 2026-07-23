@@ -111,7 +111,13 @@ export default function StudentDetail({ student, token, onUpdated }) {
             <dt style={{ fontSize: "0.9em", color: "#666", marginBottom: "4px" }}>点数</dt>
             <dd style={{ margin: 0, fontWeight: "bold", fontSize: "1.1em" }}>{student.score} 点</dd>
           </div>
+          <div>
+            {/* ★ 追加：この生徒データを誰が登録したかを表示する項目（表示専用・編集フォームには追加しない） */}
+            <dt style={{ fontSize: "0.9em", color: "#666", marginBottom: "4px" }}>投稿者</dt>
+            <dd style={{ margin: 0, fontWeight: "bold", fontSize: "1.1em" }}>{student.posted_by}</dd>
+          </div>
         </dl>
+        
 
         <div style={{ marginTop: "20px" }}>
           <button 

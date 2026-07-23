@@ -28,6 +28,7 @@ function StudentList({ students, onDelete }) {
               <th style={thStyle}>名前</th>
               <th style={thStyle}>メール</th>
               <th style={thStyle}>点数</th>
+              <th style={thStyle}>投稿者</th> 
               <th style={thStyle}></th>
             </tr>
           </thead>
@@ -62,6 +63,12 @@ function StudentRow({ student, onDelete }) {
       <td style={tdStyle}>{student.name}</td>
       <td style={tdStyle}>{student.email}</td>
       <td style={tdStyle}>{student.score}</td>
+      <td style={tdStyle}>{student.posted_by}</td>
+      <td style={tdStyle}>
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          {/* 詳細・削除ボタン（既存のまま） */}
+        </div>
+      </td>
       <td style={tdStyle}>
       <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
         <Link href={`/students/${student.id}`} style={detailLinkStyle}>

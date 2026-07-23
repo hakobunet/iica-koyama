@@ -141,7 +141,7 @@ export default function StudentsPage() {
       </header>
 
       {/* メインコンテンツ（コマ16と同じコンポーネントを使う） */}
-      <main style={{ padding: "32px", maxWidth: "900px", margin: "0 auto" }}>
+      <main style={{ padding: "32px", maxWidth: "1200px", margin: "0 auto" }}>
         <AddStudentForm onAdd={handleAdd} />
         {/* ★ 追加失敗時にAPIのエラーメッセージを表示する */}
         {addError && (

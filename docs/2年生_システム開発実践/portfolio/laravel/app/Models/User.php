@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany; // ← リレーションの型（HasMany）を使えるようにする
+
 
 class User extends Authenticatable
 {
@@ -41,4 +43,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // 1人のユーザーは複数の生徒を持つ、という関係（1対多）を表すメソッド
+    // これを定義すると $user->students で「このユーザーが登録した生徒一覧」を取得できる
+    public function students(): HasMany
+    {
+        // hasMany(Student::class) … 「Studentモデルをたくさん持っている」という意味
+        return $this->hasMany(Student::class);
+    }
 }

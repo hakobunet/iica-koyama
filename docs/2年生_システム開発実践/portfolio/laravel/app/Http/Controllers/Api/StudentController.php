@@ -15,7 +15,11 @@ class StudentController extends Controller
     // -------------------------------------------------------
     public function index()
     {
-        $students = Student::all();
+        // 生徒データを取得するときに、投稿者（user）の情報も一緒に読み込んでおく
+        // → こうしておかないと、生徒の人数分だけ「投稿者名を取る」SQLが発行されてしまう（N+1問題）
+        $students = Student::with('user')->get();
+
+        // 取得した生徒データを、レスポンス用の形（StudentResource）に変換して返す
         return StudentResource::collection($students);
     }
 
@@ -25,13 +29,16 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         // バリデーション：送られてきたデータの形式を確認する
-        $request->validate([
+        $validated = $request->validate([
             'name'  => 'required|max:100',          // 必須・100文字以内
             'email' => 'required|email|unique:students', // 必須・メール形式・重複不可
             'score' => 'required|integer|min:0|max:100', // 必須・整数・0〜100
         ]);
 
-        $student = Student::create($request->all()); // DB に保存
+        // $request->user() … 今ログインしているユーザー（Sanctumが認証してくれている）
+        // ->students()->create(...) … そのユーザーの生徒として新規作成する
+        //   → Eloquentが自動で user_id にログインユーザーのIDを入れてくれる
+        $student = $request->user()->students()->create($validated);
 
         // 201 Created（作成成功）のステータスコードで返す
         return response()->json([
