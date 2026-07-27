@@ -18,7 +18,7 @@ Robloxでは、パーツなどのオブジェクトに`Script`（または`Local
 5. エディタにLuaのコードを入力する
 6. 画面上部の「Play」ボタンでPlayモードに入ると、書いたコードが実際に動き出す
 
-<img src="images/02-01_insert-script-menu.png" alt="Explorerでの右クリック→「Insert Object」→`Script`選択メニュー" style="width:1200px;height:auto;border:1px solid #000;">
+<img src="images/02-01_insert-script-menu.png" alt="Explorerでの右クリック→「Insert Object」→`Script`選択メニュー" style="width:700px;">
 
 ### 最初のサンプル：触れたら色が変わるパーツ
 
@@ -44,9 +44,9 @@ end)
 
 **エラーが出た場合**：Outputパネルに赤字でエラーメッセージが表示される。学習中にエラーが出るのはごく普通のことなので、過度に心配しなくてよい。エラーメッセージには「何行目に問題があるか」が書かれているので、まずそこを確認する。
 
-<img src="images/02-02_sample-script-editor.png" alt="コードエディタにサンプルを入力した状態" style="width:1200px;height:auto;border:1px solid #000;">
-<img src="images/02-03_sample-script-result.png" alt="実行後、Playモードでパーツの色が変わったViewportの様子" style="width:1200px;height:auto;border:1px solid #000;">
-<img src="images/02-04_output-error-example.png" alt="エラー発生時のOutputパネルの赤字表示例" style="width:1200px;height:auto;border:1px solid #000;">
+<img src="images/02-02_sample-script-editor.png" alt="コードエディタにサンプルを入力した状態" style="width:700px;">
+<img src="images/02-03_sample-script-result.png" alt="実行後、Playモードでパーツの色が変わったViewportの様子" style="width:700px;">
+<img src="images/02-04_output-error-example.png" alt="エラー発生時のOutputパネルの赤字表示例" style="width:700px;">
 
 ---
 
@@ -64,7 +64,7 @@ Luaの文法に入る前に、Roblox特有の考え方を押さえておくと�
 | `workspace.Coin` | `Workspace`の直下にある、名前が`Coin`のオブジェクト |
 | `game.Players` | ゲーム全体（`game`）の中の`Players`という機能 |
 
-<img src="images/02-05_explorer-hierarchy.png" alt="Explorerで階層が入れ子になっている様子（例：`Workspace`→`Coin`→`Script`のように親子関係が分かる展開表示）" style="width:600px;height:auto;border:1px solid #000;">
+<img src="images/02-05_explorer-hierarchy.png" alt="Explorerで階層が入れ子になっている様子（例：`Workspace`→`Coin`→`Script`のように親子関係が分かる展開表示）" style="width:400px;">
 
 - 各オブジェクトは「プロパティ（Properties）」という設定値を持っている（パーツで言えば`Color`や`Position`など）。Luaのコードから`パーツ名.プロパティ名 = 値`という形で書き換えられる
 - 各オブジェクトは「イベント（Event）」という「何かが起きた瞬間」の合図を持っている（`Touched`＝触れられた瞬間、など）。`:Connect(関数)`で、そのイベントが起きたときに実行する処理を登録する
@@ -167,7 +167,7 @@ Roblox開発でつまずきやすい最大のポイントがこれ。最初に�
 - 確認方法：複数人が同じPlaceに入った状態で、`Script`内の`print`はサーバーのOutputに、`LocalScript`内の`print`はその人自身の画面のOutputにだけ表示される。この違いを実際に試すと感覚がつかみやすい
 - なぜ分かれているのか：オンラインゲームでは「本当に正しい情報（スコアやアイテム所持数など）」をサーバー側だけで管理しないと、悪意のあるプレイヤーが自分の画面の情報を書き換えてズルをできてしまう。だからこそ「確定させたい処理」はサーバー（`Script`）で行う、というのがオンラインゲーム開発共通の考え方になっている
 
-<img src="images/02-06_script-vs-localscript.png" alt="`ServerScriptService`に`Script`を置いた場合と、`StarterGui`に`LocalScript`を置いた場合のExplorer比較" style="width:400px;height:auto;border:1px solid #000;">
+<img src="images/02-06_script-vs-localscript.png" alt="`ServerScriptService`に`Script`を置いた場合と、`StarterGui`に`LocalScript`を置いた場合のExplorer比較" style="width:250px;">
 
 ---
 
