@@ -54,7 +54,7 @@ export default function StudentDetail({ student, token, onUpdated }) {
     setSaving(true);
 
     try {
-      const res = await fetch(`http://localhost:8000/api/students/${student.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/students/${student.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

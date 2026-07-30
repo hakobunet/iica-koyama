@@ -38,7 +38,7 @@ export default function StudentDetailPage() {
 
     try {
       // URLパラメータの params.id を使ってLaravel APIに問い合わせる
-      const res = await fetch(`http://localhost:8000/api/students/${params.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/students/${params.id}`, {
         headers: {
           "Accept": "application/json",
           "Authorization": `Bearer ${currentToken}`, // ★ トークンをヘッダーに付ける
@@ -71,7 +71,7 @@ export default function StudentDetailPage() {
   async function handleLogout() {
     const currentToken = localStorage.getItem("token");
 
-    await fetch("http://localhost:8000/api/logout", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logout`, {
       method: "POST",
       headers: {
         "Accept": "application/json",
