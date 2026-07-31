@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>阿蘇あか牛ラン</title>
+<style>
+  body {
+    margin: 0;
+    background: #10151c;
+    color: #e8eef5;
+    font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  h1 { font-size: 22px; margin: 12px 0 8px; letter-spacing: .05em; }
+  canvas {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.5);
+    touch-action: manipulation;
+  }
+  p { font-size: 13px; color: #8fa3b8; margin: 10px 0 20px; }
+</style>
+</head>
+<body>
+
+<h1 id="title">阿蘇あか牛ラン</h1>
+<canvas id="game" width="800" height="400"></canvas>
+<p>スペースキー / 画面タップ でジャンプ</p>
+
+<script>
+// ==================================================================
+// ★★★ 改造ゾーン：ここの数字と絵文字を書きかえよう！ ★★★
+// ==================================================================
+
+const GAME_TITLE = "阿蘇あか牛ラン";   // ゲームのタイトル
+
+const PLAYER   = "🐄";   // 主人公
+const OBSTACLE = "🪨";   // 障害物
+const BONUS    = "🌟";   // ラッキーアイテム
+
+const SKY_COLOR    = "#87CEEB";   // 空の色
+const GROUND_COLOR = "#7CB342";   // 地面の色
+
+const SPEED             = 12;   // ゲームの速さ（大きいほど速い）
+const GRAVITY           = 1.5;  // 重力（大きいほど重い）
+const JUMP_POWER        = 6;    // ジャンプ力（大きいほど高く跳ぶ）
+const OBSTACLE_INTERVAL = 60;   // 障害物の出る間隔（小さいほど鬼畜）
+
+// ==================================================================
+// ここから下は「エンジン」。まずは触らなくてOK！
+// ==================================================================
+
+const cv  = document.getElementById("game");
+const ctx = cv.getContext("2d");
+document.getElementById("title").textContent = GAME_TITLE;
+document.title = GAME_TITLE;
+
+const GROUND_Y = 320;
+
+let speed, gravity, frame, score, obstacles, bonuses, player, over;
+let best = 0;
+
+function reset() {
+  speed     = SPEED;
+  gravity   = GRAVITY;
+  frame     = 0;
+  score     = 0;
+  obstacles = [];
+  bonuses   = [];
+  player    = { x: 110, y: GROUND_Y, vy: 0, onGround: true, jumpCount: 0 };
+  over      = false;
+}
+
+function jump() {
+  if (over) { reset(); return; }
+
+  if (player.onGround) {
+    player.vy = -JUMP_POWER;
+    player.onGround = false;
+    player.jumpCount = 1;
+  }
+  // ★HOOK-JUMP★ ミッション3「必殺技」のコードは、この下に貼りつけよう
+}
+
+function spawnBonus() {
+  bonuses.push({ x: 830, y: GROUND_Y - 90 - Math.random() * 60 });
+}
+
+function gameOver() {
+  over = true;
+  if (score > best) best = score;
+}
+
+function update() {
+  if (over) return;
+
+  frame++;
+  score++;
+
+  player.vy += gravity;
+  player.y  += player.vy;
+  if (player.y >= GROUND_Y) {
+    player.y = GROUND_Y;
+    player.vy = 0;
+    player.onGround = true;
+    player.jumpCount = 0;
+  }
+
+  if (frame % OBSTACLE_INTERVAL === 0) obstacles.push({ x: 830, y: GROUND_Y });
+
+  for (const o of obstacles) o.x -= speed;
+  for (const b of bonuses)   b.x -= speed;
+  obstacles = obstacles.filter(o => o.x > -60);
+  bonuses   = bonuses.filter(b => b.x > -60);
+
+  for (const o of obstacles) {
+    if (Math.abs(o.x - player.x) < 32 && player.y > GROUND_Y - 38) gameOver();
+  }
+
+  for (let i = bonuses.length - 1; i >= 0; i--) {
+    const b = bonuses[i];
+    if (Math.abs(b.x - player.x) < 40 && Math.abs(b.y - player.y) < 46) {
+      score += 300;
+      bonuses.splice(i, 1);
+    }
+  }
+
+  // ★HOOK-FRAME★ ミッション3「必殺技」のコードは、この下に貼りつけよう
+}
+
+function draw() {
+  ctx.fillStyle = SKY_COLOR;
+  ctx.fillRect(0, 0, 800, 400);
+
+  ctx.fillStyle = GROUND_COLOR;
+  ctx.fillRect(0, GROUND_Y + 8, 800, 400 - GROUND_Y);
+
+  ctx.font = "44px serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+
+  for (const b of bonuses)   ctx.fillText(BONUS, b.x, b.y);
+  for (const o of obstacles) ctx.fillText(OBSTACLE, o.x, o.y);
+  ctx.fillText(PLAYER, player.x, player.y);
+
+  ctx.fillStyle = "rgba(0,0,0,.65)";
+  ctx.textAlign = "left";
+  ctx.font = "bold 22px sans-serif";
+  ctx.fillText("SCORE " + score, 20, 40);
+  ctx.font = "16px sans-serif";
+  ctx.fillText("BEST " + best, 20, 64);
+
+  if (over) {
+    ctx.fillStyle = "rgba(0,0,0,.55)";
+    ctx.fillRect(0, 0, 800, 400);
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.font = "bold 44px sans-serif";
+    ctx.fillText("GAME OVER", 400, 190);
+    ctx.font = "20px sans-serif";
+    ctx.fillText("SCORE " + score + "  /  BEST " + best, 400, 230);
+    ctx.fillText("クリック or タップ でリトライ", 400, 270);
+  }
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+window.addEventListener("keydown", e => {
+  if (e.code === "Space" || e.code === "ArrowUp") { e.preventDefault(); jump(); }
+});
+cv.addEventListener("mousedown", jump);
+cv.addEventListener("touchstart", e => { e.preventDefault(); jump(); }, { passive: false });
+
+reset();
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>パスワード解読タイム計測ツール</title>
+<style>
+  body {
+    margin: 0; padding: 24px;
+    background: #0a0e14;
+    color: #d7e0ea;
+    font-family: "Consolas", "Menlo", "Hiragino Sans", monospace;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  h1 { font-size: 20px; color: #4ade80; letter-spacing: .04em; margin: 4px 0 20px; }
+  .panel {
+    width: 100%; max-width: 720px;
+    background: #111823;
+    border: 1px solid #1f2b3a;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 18px;
+  }
+  .label { font-size: 12px; color: #7d8ea0; margin-bottom: 6px; letter-spacing: .08em; }
+  .row { display: flex; align-items: baseline; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
+  .setting { font-size: 15px; }
+  .setting b { color: #fbbf24; }
+  .result {
+    font-size: 15px; line-height: 1.9;
+  }
+  .time {
+    font-size: 30px; font-weight: bold;
+    color: #f87171;
+    display: block; margin-top: 6px;
+  }
+  .safe .time { color: #4ade80; }
+  .combos { color: #9fb0c2; font-size: 13px; }
+  input[type=text] {
+    background: #0a0e14; border: 1px solid #2a3a4d; color: #d7e0ea;
+    padding: 8px 12px; border-radius: 6px; font-family: inherit; font-size: 15px;
+    width: 220px;
+  }
+  .hint { font-size: 12px; color: #64748b; margin-top: 4px; }
+  code { background:#0a0e14; padding:1px 6px; border-radius:4px; color:#fbbf24; }
+</style>
+</head>
+<body>
+
+<h1>🔓 パスワード解読タイム計測ツール</h1>
+
+<div class="panel">
+  <div class="label">SETTINGS ── ここの数字を書き換えて実験する</div>
+
+  <div class="row setting">
+    パスワードの長さ： <b id="v_len">4</b> 文字
+  </div>
+  <div class="row setting">
+    使える文字の種類： <b id="v_kind">10</b> 種類（<span id="v_kindname">数字だけ</span>）
+  </div>
+</div>
+
+<div class="panel" id="resultPanel">
+  <div class="label">RESULT ── 総当たり攻撃で全部試すのにかかる時間</div>
+  <div class="result">
+    試す組み合わせの数：<span class="combos" id="combos">-</span>
+    <span class="time" id="time">-</span>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="label">CHECK ── パスワードの「型」だけを診断（本物は入力しない）</div>
+  <div class="row">
+    <input type="text" id="probe" placeholder="aaaa1111 のように“形”だけ入力">
+  </div>
+  <div class="hint">
+    ※ 本物のパスワードは絶対に入れないこと。文字数と文字の種類だけを見て診断します。
+  </div>
+  <div class="result" id="probeResult" style="margin-top:12px;"></div>
+</div>
+
+<script>
+// ==================================================================
+// ★★★ 実験ゾーン：この2つの数字を書き換えよう！ ★★★
+// ==================================================================
+
+const LENGTH = 4;    // パスワードの長さ（文字数）
+
+const KINDS  = 10;   // 使える文字の種類
+                     //   10  = 数字だけ (0-9)
+                     //   26  = 小文字だけ (a-z)
+                     //   62  = 英大文字+小文字+数字
+                     //   95  = 記号も全部入り
+
+// ==================================================================
+// ここから下は「エンジン」。まずは触らなくてOK！
+// ==================================================================
+
+// 1秒間に試せる回数（＝攻撃者のPCの速さ。ここでは10億回/秒と仮定）
+const GUESSES_PER_SECOND = 1e9;
+
+const KIND_NAMES = {
+  10: "数字だけ",
+  26: "小文字だけ",
+  62: "英大文字＋小文字＋数字",
+  95: "記号も全部入り"
+};
+
+function formatTime(seconds) {
+  if (seconds < 1)              return (seconds * 1000).toFixed(3) + " ミリ秒";
+  if (seconds < 60)            return seconds.toFixed(1) + " 秒";
+  if (seconds < 3600)         return (seconds / 60).toFixed(1) + " 分";
+  if (seconds < 86400)        return (seconds / 3600).toFixed(1) + " 時間";
+  if (seconds < 31536000)     return (seconds / 86400).toFixed(1) + " 日";
+  const years = seconds / 31536000;
+  if (years < 1e4)            return years.toFixed(0) + " 年";
+  if (years < 1e8)            return (years / 1e4).toFixed(0) + " 万年";
+  if (years < 1.38e10)        return (years / 1e8).toFixed(1) + " 億年";
+  return "宇宙の年齢（138億年）より長い";
+}
+
+function formatBig(n) {
+  if (n < 1e4) return n.toLocaleString();
+  if (n < 1e8) return (n / 1e4).toFixed(0) + " 万 通り";
+  if (n < 1e12) return (n / 1e8).toFixed(0) + " 億 通り";
+  if (n < 1e16) return (n / 1e12).toFixed(0) + " 兆 通り";
+  return n.toExponential(1) + " 通り";
+}
+
+function calc(length, kinds) {
+  return Math.pow(kinds, length);
+}
+
+function render() {
+  document.getElementById("v_len").textContent  = LENGTH;
+  document.getElementById("v_kind").textContent = KINDS;
+  document.getElementById("v_kindname").textContent = KIND_NAMES[KINDS] || "カスタム";
+
+  const combos  = calc(LENGTH, KINDS);
+  const seconds = combos / GUESSES_PER_SECOND;
+
+  document.getElementById("combos").textContent = formatBig(combos);
+  const timeEl = document.getElementById("time");
+  timeEl.textContent = formatTime(seconds);
+
+  const panel = document.getElementById("resultPanel");
+  panel.classList.toggle("safe", seconds > 31536000 * 100); // 100年以上なら安全色
+}
+
+// パスワードの「型」診断（実際の文字は保存も送信もしない）
+function probe(text) {
+  const len = text.length;
+  let kinds = 0;
+  if (/[0-9]/.test(text))      kinds += 10;
+  if (/[a-z]/.test(text))      kinds += 26;
+  if (/[A-Z]/.test(text))      kinds += 26;
+  if (/[^0-9a-zA-Z]/.test(text)) kinds += 33;
+  if (kinds === 0) return "";
+
+  const combos  = Math.pow(kinds, len);
+  const seconds = combos / GUESSES_PER_SECOND;
+  const t = formatTime(seconds);
+  const verdict = seconds > 31536000 * 100
+    ? '<span style="color:#4ade80">✅ 強い！ この型なら安心です</span>'
+    : '<span style="color:#f87171">⚠️ 危険！ 現実的な時間で破られます</span>';
+
+  return `長さ <b style="color:#fbbf24">${len}</b> 文字 ／ 文字の種類 約 <b style="color:#fbbf24">${kinds}</b><br>`
+       + `解読時間の目安：<b class="time" style="font-size:22px">${t}</b><br>${verdict}`;
+}
+
+document.getElementById("probe").addEventListener("input", e => {
+  document.getElementById("probeResult").innerHTML = probe(e.target.value);
+});
+
+render();
+</script>
+</body>
+</html>
