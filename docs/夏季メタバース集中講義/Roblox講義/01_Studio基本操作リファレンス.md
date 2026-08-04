@@ -19,7 +19,7 @@ Baseplateを開くと、以下4つの主要パネルが表示される。それ�
 | Output（出力） | 画面下部 | エラーメッセージや、スクリプトの`print`命令で出力した文字が表示される場所。Luaスクリプトを書き始める2日目以降によく使う |
 | Viewport（ビューポート） | 画面中央 | 実際の3D空間が表示されるメイン画面。ここでパーツを見たり、視点を動かしたりする |
 
-<img src="images/01-01_screen-layout.png" alt="Studioの全体画面（Explorer・Properties・Toolbox・Output・Viewportの位置に矢印や枠で名前を書き込んだもの）" style="width:700px;">
+<img src="../images/01-01_screen-layout.png" alt="Studioの全体画面（Explorer・Properties・Toolbox・Output・Viewportの位置に矢印や枠で名前を書き込んだもの）" style="width:700px;">
 
 - **Properties／Toolboxが表示されていない場合**：上部メニューの`View`タブを開き、該当パネル名にチェックを入れると再表示される
 - 各パネルはドラッグして位置を動かしたり、タブとして重ねたりできる。操作に慣れないうちは、初期配置のまま触ってよい
@@ -52,7 +52,7 @@ Robloxでモノを作る＝「パーツ（Part）」と呼ばれる基本図形�
 3. クリックすると、Viewportの中央付近（多くの場合Baseplateの上）に灰色のパーツが1つ出現する
 4. Explorerの`Workspace`の中に、今置いたパーツが新しい項目として追加されているのを確認する（Workspaceは「実際にプレイヤーが触れる空間」の入れ物だと考えてよい）
 
-<img src="images/01-02_part-button-menu.png" alt="「Home」タブの「Part」ボタンと、クリックしたときに出る形状選択の▼メニュー" style="width:700px;">
+<img src="../images/01-02_part-button-menu.png" alt="「Home」タブの「Part」ボタンと、クリックしたときに出る形状選択の▼メニュー" style="width:700px;">
 
 別の方法として、Explorer上で`Workspace`を右クリック→「Insert Object」→一覧から`Part`を選ぶことでも同じ結果になる。ボタンから置くかExplorerから置くかは好みでよい。
 
@@ -64,7 +64,7 @@ Robloxでモノを作る＝「パーツ（Part）」と呼ばれる基本図形�
 2. 検索結果の一覧からモデルをクリックすると、Viewport内（多くの場合原点付近）に自動的に配置される
 3. 配置後は3-3・4章の操作でパーツと同じように移動・拡大縮小ができる
 
-<img src="images/01-03_toolbox-search.png" alt="Toolboxで「tree」等を検索した結果一覧の画面" style="width:700px;">
+<img src="../images/01-03_toolbox-search.png" alt="Toolboxで「tree」等を検索した結果一覧の画面" style="width:700px;">
 
 - 無料で使えるものと、Robuxが必要なものが混在しているので、検索結果の価格表示を確認してから使う
 - 講習用途では「Free（無料）」のものだけを使うよう案内する
@@ -82,7 +82,7 @@ Robloxでモノを作る＝「パーツ（Part）」と呼ばれる基本図形�
 3. 数値を直接書き換えると、その座標にパーツが移動する（`X`＝左右、`Y`＝上下、`Z`＝前後、と覚えるとよい）
 4. 同様に`Size`（大きさ）もX・Y・Zの数値で調整できる
 
-<img src="images/01-04_position-size-properties.png" alt="Propertiesパネルの`Position`・`Size`のXYZ数値入力欄" style="width:700px;">
+<img src="../images/01-04_position-size-properties.png" alt="Propertiesパネルの`Position`・`Size`のXYZ数値入力欄" style="width:700px;">
 
 「他のパーツにぴったりくっつけたい」ときは、くっつけたい相手のパーツの`Position`と`Size`の数値をProperties上で確認し、その数値をもとに計算して隣に置くパーツの`Position`を決める、という考え方をすると狙った位置に置きやすい。
 
@@ -92,7 +92,7 @@ Robloxでモノを作る＝「パーツ（Part）」と呼ばれる基本図形�
 
 配置したパーツを選択した状態で、画面上部の「Home」タブにある各ツールを使う。ツールのアイコンは画面左上、「選択」アイコンのすぐ右に「移動」「拡大/縮小」「回転」「変換」の順で並んでいる。
 
-<img src="images/01-05a_toolbar-location.png" alt="Home タブ左上に並ぶ「選択」「移動」「拡大/縮小」「回転」「変換」の各ツールアイコン" style="width:700px;">
+<img src="../images/01-05a_toolbar-location.png" alt="Home タブ左上に並ぶ「選択」「移動」「拡大/縮小」「回転」「変換」の各ツールアイコン" style="width:700px;">
 
 | 操作 | 方法 | 補足 |
 |---|---|---|
@@ -105,7 +105,7 @@ Robloxでモノを作る＝「パーツ（Part）」と呼ばれる基本図形�
 
 **壁や床を組み立てる基本の流れ**：1枚パーツを配置→複製（`Ctrl+D`）→Moveツールで少しずらす、を繰り返すと、同じ形のパーツを並べて壁や床を作れる。
 
-<img src="images/01-05_transform-gizmos.png" alt="Move／Rotate／Scaleツールを選んだときにパーツ上に表示される矢印・円・ハンドル（ギズモ）の見た目" style="width:700px;">
+<img src="../images/01-05_transform-gizmos.png" alt="Move／Rotate／Scaleツールを選んだときにパーツ上に表示される矢印・円・ハンドル（ギズモ）の見た目" style="width:700px;">
 
 ---
 
@@ -127,8 +127,8 @@ Robloxでモノを作る＝「パーツ（Part）」と呼ばれる基本図形�
 2. 選択した状態で右クリック→「モデルとしてグループ化」（Group）を選ぶ（Studioのバージョンによっては単に「Group」と表示される場合もある）
 3. Explorer上で、選んだパーツたちが`Model`という1つのまとまりの中に入っていることを確認する
 
-<img src="images/01-06_group-context-menu.png" alt="複数パーツ選択時の右クリックメニュー（「モデルとしてグループ化」の項目）" style="width:150px;">
-<img src="images/01-07_group-explorer-result.png" alt="グループ化後、Explorerで`Model`としてまとまっている状態" style="width:700px;">
+<img src="../images/01-06_group-context-menu.png" alt="複数パーツ選択時の右クリックメニュー（「モデルとしてグループ化」の項目）" style="width:150px;">
+<img src="../images/01-07_group-explorer-result.png" alt="グループ化後、Explorerで`Model`としてまとまっている状態" style="width:700px;">
 
 グループ化すると、Model自体を選んでMoveツールで動かすだけで、中の全パーツがまとめて移動する。以降のチーム共同制作や講習全体を通してよく使う操作。
 
@@ -144,7 +144,7 @@ Robloxの世界には重力がある。Playモード（実際にプレイヤー�
 
 **確認方法**：画面上部の「Play」ボタンを押すとPlayモードになり、実際にキャラクターとして空間内を歩き回れる。ここで自分が作ったパーツが落下していないかを確認する。「Stop」ボタンで通常の編集画面に戻る。
 
-<img src="images/01-08_anchored-checkbox.png" alt="Propertiesパネルの`Anchored`チェックボックス" style="width:700px;">
+<img src="../images/01-08_anchored-checkbox.png" alt="Propertiesパネルの`Anchored`チェックボックス" style="width:700px;">
 
 ---
 
@@ -180,8 +180,8 @@ Robloxの世界には重力がある。Playモード（実際にプレイヤー�
 5. 全員がStudioからそのPlaceを開くと、画面右上に参加中のメンバーのアイコンが並んで表示される。これがTeam Create接続の成功サイン
 6. 誰か1人がパーツを動かすと、他のメンバーの画面にもリアルタイムで反映される
 
-<img src="images/01-09_collaborators-invite.png" alt="Placeの「Collaborators」招待設定画面" style="width:700px;">
-<img src="images/01-10_team-create-icons.png" alt="Team Create接続後、画面右上に並ぶメンバーアイコン" style="width:700px;">
+<img src="../images/01-09_collaborators-invite.png" alt="Placeの「Collaborators」招待設定画面" style="width:700px;">
+<img src="../images/01-10_team-create-icons.png" alt="Team Create接続後、画面右上に並ぶメンバーアイコン" style="width:700px;">
 
 ---
 
