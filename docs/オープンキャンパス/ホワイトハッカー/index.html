@@ -98,6 +98,7 @@ const KINDS  = 10;   // 使える文字の種類
 // 1秒間に試せる回数（＝攻撃者のPCの速さ。ここでは10億回/秒と仮定）
 const GUESSES_PER_SECOND = 1e9;
 
+// KINDS（使える文字の種類の数）から、画面に表示する名前を引くための対応表
 const KIND_NAMES = {
   10: "数字だけ",
   26: "小文字だけ",
@@ -105,56 +106,66 @@ const KIND_NAMES = {
   95: "記号も全部入り"
 };
 
+// 秒数を受け取って、人が読みやすい単位（ミリ秒〜億年）の文字列に変換する関数
+// 数字が大きいほど下の条件に進んでいき、ちょうどいい単位で止まる
 function formatTime(seconds) {
   if (seconds < 1)              return (seconds * 1000).toFixed(3) + " ミリ秒";
   if (seconds < 60)            return seconds.toFixed(1) + " 秒";
   if (seconds < 3600)         return (seconds / 60).toFixed(1) + " 分";
   if (seconds < 86400)        return (seconds / 3600).toFixed(1) + " 時間";
-  if (seconds < 31536000)     return (seconds / 86400).toFixed(1) + " 日";
+  if (seconds < 31536000)     return (seconds / 86400).toFixed(1) + " 日";   // 31536000秒＝1年
   const years = seconds / 31536000;
   if (years < 1e4)            return years.toFixed(0) + " 年";
   if (years < 1e8)            return (years / 1e4).toFixed(0) + " 万年";
   if (years < 1.38e10)        return (years / 1e8).toFixed(1) + " 億年";
-  return "宇宙の年齢（138億年）より長い";
+  return "宇宙の年齢（138億年）より長い";   // それより長かったら単位で言っても意味がないので固定の文言
 }
 
+// 組み合わせの数（とても大きい数になりがち）を、万・億・兆などの単位で読みやすくする関数
 function formatBig(n) {
-  if (n < 1e4) return n.toLocaleString();
+  if (n < 1e4) return n.toLocaleString();               // 1万未満はそのまま「1,234」のように表示
   if (n < 1e8) return (n / 1e4).toFixed(0) + " 万 通り";
   if (n < 1e12) return (n / 1e8).toFixed(0) + " 億 通り";
   if (n < 1e16) return (n / 1e12).toFixed(0) + " 兆 通り";
-  return n.toExponential(1) + " 通り";
+  return n.toExponential(1) + " 通り";                   // それ以上は「1.2e+20」のような指数表記
 }
 
+// パスワードの組み合わせの総数を計算する関数
+// 「文字の種類の数」を「文字数」だけ掛け合わせる＝ kinds の length乗
+// （例：数字4桁なら 10 × 10 × 10 × 10 = 10^4 通り）
 function calc(length, kinds) {
   return Math.pow(kinds, length);
 }
 
+// 画面上部の「SETTINGS」「RESULT」パネルの表示を更新する関数
+// LENGTHやKINDSの値を変えたら、この関数が呼ばれて画面に反映される
 function render() {
   document.getElementById("v_len").textContent  = LENGTH;
   document.getElementById("v_kind").textContent = KINDS;
   document.getElementById("v_kindname").textContent = KIND_NAMES[KINDS] || "カスタム";
 
-  const combos  = calc(LENGTH, KINDS);
-  const seconds = combos / GUESSES_PER_SECOND;
+  const combos  = calc(LENGTH, KINDS);            // 組み合わせの総数
+  const seconds = combos / GUESSES_PER_SECOND;    // 全部試すのにかかる秒数（総数 ÷ 1秒あたりの試行回数）
 
   document.getElementById("combos").textContent = formatBig(combos);
   const timeEl = document.getElementById("time");
   timeEl.textContent = formatTime(seconds);
 
   const panel = document.getElementById("resultPanel");
-  panel.classList.toggle("safe", seconds > 31536000 * 100); // 100年以上なら安全色
+  panel.classList.toggle("safe", seconds > 31536000 * 100); // 解読に100年以上かかるなら「安全」の色にする
 }
 
 // パスワードの「型」診断（実際の文字は保存も送信もしない）
+// 入力された文字列そのものではなく、「何文字か」「どんな種類の文字を含むか」だけを見て強さを判定する
 function probe(text) {
   const len = text.length;
   let kinds = 0;
-  if (/[0-9]/.test(text))      kinds += 10;
-  if (/[a-z]/.test(text))      kinds += 26;
-  if (/[A-Z]/.test(text))      kinds += 26;
-  if (/[^0-9a-zA-Z]/.test(text)) kinds += 33;
-  if (kinds === 0) return "";
+  // 含まれている文字の種類ごとに、使える文字数を足し合わせていく（複数種類使っていれば強くなる）
+  if (/[0-9]/.test(text))      kinds += 10;   // 数字を含む
+  if (/[a-z]/.test(text))      kinds += 26;   // 小文字アルファベットを含む
+  if (/[A-Z]/.test(text))      kinds += 26;   // 大文字アルファベットを含む
+  if (/[^0-9a-zA-Z]/.test(text)) kinds += 33; // それ以外（記号など）を含む
+  if (kinds === 0) return "";   // まだ何も入力されていなければ何も表示しない
 
   const combos  = Math.pow(kinds, len);
   const seconds = combos / GUESSES_PER_SECOND;
@@ -167,11 +178,12 @@ function probe(text) {
        + `解読時間の目安：<b class="time" style="font-size:22px">${t}</b><br>${verdict}`;
 }
 
+// 診断用の入力欄（#probe）に文字を打つたびに、probe()で診断してその結果を画面に表示する
 document.getElementById("probe").addEventListener("input", e => {
   document.getElementById("probeResult").innerHTML = probe(e.target.value);
 });
 
-render();
+render();   // ページを開いたときに一度、SETTINGS/RESULTパネルを表示しておく
 </script>
 </body>
 </html>

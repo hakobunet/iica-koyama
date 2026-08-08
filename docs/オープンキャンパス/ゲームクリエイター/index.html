@@ -43,9 +43,10 @@
 
 const GAME_TITLE = "阿蘇あか牛ラン";   // ゲームのタイトル
 
-const PLAYER   = "🐄";   // 主人公
-const OBSTACLE = "🪨";   // 障害物
-const BONUS    = "🌟";   // ラッキーアイテム
+const PLAYER      = "🐄";   // 主人公
+const PLAYER_FLIP = true;   // 主人公アイコンの向き（true=左右反転する / false=そのまま）
+const OBSTACLE    = "🪨";   // 障害物
+const BONUS       = "🌟";   // ラッキーアイテム
 
 const SKY_COLOR    = "#87CEEB";   // 空の色
 const GROUND_COLOR = "#7CB342";   // 地面の色
@@ -66,92 +67,116 @@ document.title = GAME_TITLE;
 
 const GROUND_Y = 320;
 
+// ゲーム中に値が変わる「状態」をまとめた変数たち（最初は中身が決まっていないのでletで宣言）
 let speed, gravity, frame, score, obstacles, bonuses, player, over;
-let best = 0;
+let best = 0;   // 自己ベストのスコア（リトライしても0に戻らない）
 
+// ゲームを最初の状態に戻す関数。
+// ゲームを起動したときと、GAME OVER後にリトライしたときの両方で呼ばれる。
 function reset() {
-  speed     = SPEED;
-  gravity   = GRAVITY;
-  frame     = 0;
-  score     = 0;
-  obstacles = [];
-  bonuses   = [];
+  speed     = SPEED;     // 速さを改造ゾーンの初期値に戻す
+  gravity   = GRAVITY;   // 重力も初期値に戻す
+  frame     = 0;         // 経過フレーム数（ゲーム開始からの時間のようなもの）を0に
+  score     = 0;         // スコアを0に
+  obstacles = [];        // 障害物を全部消す（中身が空の配列にする）
+  bonuses   = [];        // アイテムも全部消す
   player    = { x: 110, y: GROUND_Y, vy: 0, onGround: true, jumpCount: 0 };
-  over      = false;
+  // player は主人公の状態。x,y=位置、vy=縦方向の速度、onGround=地面にいるか、jumpCount=何回ジャンプしたか
+  over      = false;     // ゲームオーバー状態を解除
 }
 
+// ジャンプボタン（スペースキー / 画面タップ / クリック）が押されたときに呼ばれる関数
 function jump() {
-  if (over) { reset(); return; }
+  if (over) { reset(); return; }   // ゲームオーバー中に押されたら、最初からやり直す（リトライ）
 
-  if (player.onGround) {
-    player.vy = -JUMP_POWER;
-    player.onGround = false;
-    player.jumpCount = 1;
+  if (player.onGround) {           // 地面にいるときだけジャンプできる
+    player.vy = -JUMP_POWER;       // 上向きの速度を与える（yはマイナス方向＝上なので、マイナスにする）
+    player.onGround = false;       // 空中にいる状態にする
+    player.jumpCount = 1;          // 1回目のジャンプをしたことを記録（2段ジャンプなどを作るときに使う）
   }
   // ★HOOK-JUMP★ ミッション3「必殺技」のコードは、この下に貼りつけよう
 }
 
+// アイテム（🌟）を1つ、画面の右外側にランダムな高さで出現させる関数
 function spawnBonus() {
   bonuses.push({ x: 830, y: GROUND_Y - 90 - Math.random() * 60 });
 }
 
+// ゲームオーバーになったときの処理をする関数
 function gameOver() {
-  over = true;
-  if (score > best) best = score;
+  over = true;                          // ゲームオーバー状態にする
+  if (score > best) best = score;       // 今回のスコアが自己ベストを超えていたら更新する
 }
 
+// ゲームの状態を1コマ（1フレーム）分だけ進める関数。毎フレーム自動で呼ばれる。
 function update() {
-  if (over) return;
+  if (over) return;   // ゲームオーバー中は何も動かさない
 
-  frame++;
-  score++;
+  frame++;   // 経過フレーム数を1増やす
+  score++;   // 生きているだけでスコアが1増える（時間経過ボーナス）
 
-  player.vy += gravity;
-  player.y  += player.vy;
-  if (player.y >= GROUND_Y) {
-    player.y = GROUND_Y;
-    player.vy = 0;
-    player.onGround = true;
-    player.jumpCount = 0;
+  // --- 主人公の上下移動（ジャンプと落下） ---
+  player.vy += gravity;      // 重力の分だけ下向きの速度を増やす（だんだん落ちるスピードが速くなる）
+  player.y  += player.vy;    // 速度の分だけ縦位置を動かす
+  if (player.y >= GROUND_Y) {        // 地面より下に行きそうになったら
+    player.y = GROUND_Y;             // 地面の高さで止める
+    player.vy = 0;                   // 落下速度をリセット
+    player.onGround = true;          // 「地面にいる」状態に戻す（また地上ジャンプできるようになる）
+    player.jumpCount = 0;            // ジャンプ回数もリセット
   }
 
+  // --- 障害物・アイテムの出現と移動 ---
   if (frame % OBSTACLE_INTERVAL === 0) obstacles.push({ x: 830, y: GROUND_Y });
+  // ↑ frameがOBSTACLE_INTERVALの倍数になるたび（一定間隔ごと）に、新しい障害物を画面右外に出す
 
-  for (const o of obstacles) o.x -= speed;
-  for (const b of bonuses)   b.x -= speed;
-  obstacles = obstacles.filter(o => o.x > -60);
-  bonuses   = bonuses.filter(b => b.x > -60);
+  for (const o of obstacles) o.x -= speed;   // 障害物を左に動かす（＝主人公が右へ進んでいるように見せる）
+  for (const b of bonuses)   b.x -= speed;   // アイテムも同じように左へ動かす
+  obstacles = obstacles.filter(o => o.x > -60);   // 画面の外（左）まで流れきった障害物は配列から取り除く
+  bonuses   = bonuses.filter(b => b.x > -60);     // アイテムも同様に取り除く
 
+  // --- 障害物との当たり判定（ぶつかったらゲームオーバー） ---
   for (const o of obstacles) {
     if (Math.abs(o.x - player.x) < 32 && player.y > GROUND_Y - 38) gameOver();
+    // ↑ 主人公と障害物のx方向の距離が近く、かつジャンプで避けきれていない（低い位置にいる）ならゲームオーバー
   }
 
+  // --- アイテムとの当たり判定（触れたらスコア加算して消す） ---
   for (let i = bonuses.length - 1; i >= 0; i--) {
     const b = bonuses[i];
     if (Math.abs(b.x - player.x) < 40 && Math.abs(b.y - player.y) < 46) {
-      score += 300;
-      bonuses.splice(i, 1);
+      // ↑ 主人公とアイテムのx,y両方の距離が近い＝重なっている＝取った
+      score += 300;            // スコアを300点まとめて加算
+      bonuses.splice(i, 1);    // そのアイテムを配列から取り除く（画面からも消える）
     }
   }
 
   // ★HOOK-FRAME★ ミッション3「必殺技」のコードは、この下に貼りつけよう
 }
 
+// 画面に絵を描く関数。update()で状態を更新したあと、毎フレーム呼ばれる。
 function draw() {
   ctx.fillStyle = SKY_COLOR;
-  ctx.fillRect(0, 0, 800, 400);
+  ctx.fillRect(0, 0, 800, 400);          // 画面全体を空の色で塗りつぶす
 
   ctx.fillStyle = GROUND_COLOR;
-  ctx.fillRect(0, GROUND_Y + 8, 800, 400 - GROUND_Y);
+  ctx.fillRect(0, GROUND_Y + 8, 800, 400 - GROUND_Y);   // 地面の部分を地面の色で塗る
 
   ctx.font = "44px serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
+  // ↑ ここから先の文字（絵文字）を、この大きさ・揃え方で描きますという設定
 
-  for (const b of bonuses)   ctx.fillText(BONUS, b.x, b.y);
-  for (const o of obstacles) ctx.fillText(OBSTACLE, o.x, o.y);
-  ctx.fillText(PLAYER, player.x, player.y);
+  for (const b of bonuses)   ctx.fillText(BONUS, b.x, b.y);       // アイテムを全部描く
+  for (const o of obstacles) ctx.fillText(OBSTACLE, o.x, o.y);    // 障害物を全部描く
 
+  // 主人公を描く部分。PLAYER_FLIPがtrueのときは絵文字を左右反転させて、進む向きに合わせている
+  ctx.save();                              // 今の描画設定をいったん保存
+  ctx.translate(player.x, player.y);       // 描く原点を主人公の位置に移動
+  if (PLAYER_FLIP) ctx.scale(-1, 1);       // x方向だけ-1倍にして左右反転
+  ctx.fillText(PLAYER, 0, 0);              // 移動・反転した原点(0,0)に主人公を描く
+  ctx.restore();                           // 保存しておいた描画設定に戻す（他の絵に影響しないように）
+
+  // --- スコアの表示 ---
   ctx.fillStyle = "rgba(0,0,0,.65)";
   ctx.textAlign = "left";
   ctx.font = "bold 22px sans-serif";
@@ -159,9 +184,10 @@ function draw() {
   ctx.font = "16px sans-serif";
   ctx.fillText("BEST " + best, 20, 64);
 
+  // --- ゲームオーバー画面 ---
   if (over) {
     ctx.fillStyle = "rgba(0,0,0,.55)";
-    ctx.fillRect(0, 0, 800, 400);
+    ctx.fillRect(0, 0, 800, 400);          // 画面全体を半透明の黒で覆う
     ctx.fillStyle = "#fff";
     ctx.textAlign = "center";
     ctx.font = "bold 44px sans-serif";
@@ -172,20 +198,24 @@ function draw() {
   }
 }
 
+// ゲームのメインループ。「状態を更新→描画」を1セットとして、
+// requestAnimationFrameでブラウザに「次の画面更新のタイミングでまたloopを呼んでね」と頼み、
+// これを繰り返すことでアニメーション（動き）になる。
 function loop() {
   update();
   draw();
   requestAnimationFrame(loop);
 }
 
+// --- 操作方法の設定：どれもjump()を呼ぶだけ ---
 window.addEventListener("keydown", e => {
   if (e.code === "Space" || e.code === "ArrowUp") { e.preventDefault(); jump(); }
-});
-cv.addEventListener("mousedown", jump);
-cv.addEventListener("touchstart", e => { e.preventDefault(); jump(); }, { passive: false });
+});   // スペースキー or 上矢印キーでジャンプ
+cv.addEventListener("mousedown", jump);   // マウスでクリックしてもジャンプ
+cv.addEventListener("touchstart", e => { e.preventDefault(); jump(); }, { passive: false });   // スマホでタップしてもジャンプ
 
-reset();
-loop();
+reset();   // まず状態を初期化して
+loop();    // ゲームループを開始する
 </script>
 </body>
 </html>
