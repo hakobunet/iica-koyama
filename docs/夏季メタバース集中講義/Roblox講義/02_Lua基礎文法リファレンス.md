@@ -12,7 +12,7 @@ Robloxでは、パーツなどのオブジェクトに`Script`（または`Local
 
 1. Explorerでスクリプトを追加したい対象（例：パーツ）を選択する
 2. 右クリック→「Insert Object」を選ぶ
-3. 一覧から`Script`（または`LocalScript`）を選ぶ
+3. 一覧から`Script`を選ぶ
 4. 対象の子オブジェクトとしてスクリプトが追加され、コードエディタが自動的に開く
 5. エディタにLuaのコードを入力する
 6. 画面上部の「Play」ボタンでPlayモードに入ると、書いたコードが実際に動き出す
@@ -110,6 +110,22 @@ end
 - `i`が1から10まで1ずつ増えながら、間の処理が10回繰り返される
 - 「配列やリストの中身を1つずつ処理したい」ときにも使う（`for _, obj in ipairs(一覧) do ... end`という形。3-5章のコードスニペット集で実例を扱う）
 
+### while文：条件が成り立つ間繰り返す
+
+```lua
+local count = 0
+
+while count < 5 do
+    print(count)
+    count = count + 1
+end
+```
+
+- `while 条件 then`ではなく`while 条件 do ... end`という形になる点に注意（`if`は`then`、`while`は`do`）
+- `for`が「何回繰り返すか」をあらかじめ決めて回すのに対し、`while`は「条件が成り立っている間はずっと繰り返す」という書き方。繰り返す回数が決まっていない場合や、何らかの状態が変わるまで繰り返したい場合に使う
+- 上の例では`count`が5未満の間だけループが続く。ループの中で`count = count + 1`のように条件に関わる変数を更新し忘れると、条件が永遠に成り立ち続けて処理が止まらなくなる（無限ループ）ので注意
+- `while true do ... end`と書くと「条件が常に`true`＝終わりを指定しない無限ループ」になる。8章の移動スクリプトなど、毎フレーム動かし続けたい処理でよく使われる形
+
 ### 関数：処理をひとまとまりにして名前をつける
 
 ```lua
@@ -144,6 +160,7 @@ PHPなどのサーバーサイド言語の経験がある場合は、以下の�
 | 変数 | `local score = 0` | `$score = 0;` |
 | if文 | `if score > 0 then ... end` | `if ($score > 0) { ... }` |
 | for文 | `for i = 1, 10 do ... end` | `for ($i = 1; $i <= 10; $i++) { ... }` |
+| while文 | `while count < 5 do ... end` | `while ($count < 5) { ... }` |
 | 関数定義 | `local function foo() ... end` | `function foo() { ... }` |
 | コメント | `-- コメント` | `// コメント` |
 
@@ -294,7 +311,9 @@ part.Touched:Connect(function(hit)
     local humanoid = character:FindFirstChild("Humanoid")
 
     if humanoid then
-        humanoid.JumpHeight = 20
+        humanoid.JumpHeight = 20 -- ① ジャンプ力を 20 にする
+        task.wait(1)             -- ② 5秒待つ
+        humanoid.JumpHeight = 7.2 -- ③ デフォルトの 7.2 に戻す
     end
 end)
 ```
@@ -313,6 +332,8 @@ part.Touched:Connect(function(hit)
 
     if humanoid then
         humanoid.WalkSpeed = 32
+        task.wait(1)   
+        humanoid.WalkSpeed = 16
     end
 end)
 ```
