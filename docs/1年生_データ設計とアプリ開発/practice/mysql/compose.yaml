@@ -9,7 +9,7 @@ services:
       MYSQL_PASSWORD: password
       TZ: Asia/Tokyo
     ports:
-      - "3307:3306" # XAMPP の MySQL（3306）とぶつからないように 3307 にする
+      - "3306:3306" # XAMPP の MySQL と同じ番号なので、XAMPP は止めておく
     volumes:
       - mysql-data:/var/lib/mysql # データはここに保存され、コンテナを消しても残る
     networks:

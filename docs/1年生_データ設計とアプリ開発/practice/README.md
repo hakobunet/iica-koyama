@@ -25,18 +25,28 @@ practice/
 > Docker Desktop を起動して、左下が **Engine running** になっていることを確認してから始めます。
 > Docker Desktop の入れ方 → [Docker Desktopをインストールする](../後期/20261008/20261008_資料.md)
 
+> **XAMPP は止めておく**
+> XAMPP を使っている場合は、XAMPP Control Panel を開き、動いているもの（Apache・MySQL など）をすべて **Stop** してから始めます。
+> XAMPP の MySQL が動いていると、同じ `3306` 番ポートを使うので MySQL コンテナが起動できません。
+
 ---
 
 ## 1. 置き場所
 
-`practice` フォルダを、次のような場所に置きます。
+C ドライブに `git` というフォルダを作り、その中にプロジェクトごとに入れていきます。
 
 ```
-C:\Users\<ユーザー名>\Desktop\practice
+C:\git\practice
 ```
+
+デスクトップに置いてもかまいません。
+
+> **どこに保存したかを覚えておく**
+> 起動や停止のたびに、そのフォルダへ `cd` で移動します。保存した場所がわからなくなると操作できません。
 
 > **OneDrive の中は避ける**
 > `C:\Users\<ユーザー名>\OneDrive\...` の中に置くと、同期とぶつかって遅くなったり、エラーになったりします。
+> PC によってはデスクトップが OneDrive の中にあるので、迷ったら `C:\git` に置きます。
 
 ---
 
@@ -50,15 +60,15 @@ graph LR
     A[1. mysql フォルダで<br>docker compose up -d] --> B[2. laravel フォルダで<br>docker compose up -d] --> C[3. ブラウザで<br>localhost:8000]
 ```
 
-PowerShell で実行します。
+PowerShell で実行します。（`C:\git\practice` 以外に置いた場合は、保存した場所に読みかえます）
 
 ```powershell
-cd C:\Users\<ユーザー名>\Desktop\practice\mysql
+cd C:\git\practice\mysql
 docker compose up -d
 ```
 
 ```powershell
-cd C:\Users\<ユーザー名>\Desktop\practice\laravel
+cd C:\git\practice\laravel
 docker compose up -d
 ```
 
@@ -82,12 +92,12 @@ docker compose logs -f
 起動したときの **逆の順番**（laravel → mysql）で止めます。
 
 ```powershell
-cd C:\Users\<ユーザー名>\Desktop\practice\laravel
+cd C:\git\practice\laravel
 docker compose down
 ```
 
 ```powershell
-cd C:\Users\<ユーザー名>\Desktop\practice\mysql
+cd C:\git\practice\mysql
 docker compose down
 ```
 
@@ -100,12 +110,12 @@ docker compose down
 | 項目 | Laravel から | PC（A5:SQL Mk-2 など）から |
 |------|-------------|--------------------------|
 | ホスト | `mysql` | `127.0.0.1` |
-| ポート | `3306` | **`3307`** |
+| ポート | `3306` | `3306` |
 | データベース | `laravel` | `laravel` |
 | ユーザー名 | `laravel` | `laravel` |
 | パスワード | `password` | `password` |
 
-PC 側のポートを `3307` にしているのは、XAMPP の MySQL（`3306`）とぶつからないようにするためです。
+PC 側のポートは XAMPP の MySQL と同じ `3306` です。そのため、XAMPP の MySQL は止めておきます。
 Laravel の設定は `laravel/src/.env` に書かれています。
 
 ---
@@ -127,6 +137,6 @@ docker compose exec laravel php artisan make:controller TodoController
 |------|------|
 | `network practice-network declared as external, but could not be found` | mysql を先に起動していない → mysql フォルダで `docker compose up -d` |
 | ログに `MySQL の起動を待っています...` が続く | mysql コンテナが動いているか、Docker Desktop の `Containers` で確認 |
-| `port is already allocated`（ポートが使われている） | XAMPP や `php -S` など、同じポートを使うものを止める |
+| `port is already allocated`（ポートが使われている） | XAMPP Control Panel で MySQL などを Stop する。`php -S` など、同じポートを使うものも止める |
 | 初回のインストールが途中で失敗した | laravel フォルダで `docker compose down` → `src` フォルダを削除 → もう一度 `docker compose up -d` |
 | データベースを最初からやり直したい | mysql フォルダで `docker compose down -v`（**データが全部消えます**） |
