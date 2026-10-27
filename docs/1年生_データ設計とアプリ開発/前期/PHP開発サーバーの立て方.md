@@ -1,4 +1,4 @@
-# PHP開発サーバーのたて方
+# PHP開発サーバーの立て方
 
 PHPファイルはブラウザで直接開いても実行されない（ソースがそのまま表示される/ダウンロードされる）。
 PHPはサーバー側で解釈される言語なので、必ず `php -S` などのサーバー経由でアクセスする。
@@ -62,6 +62,13 @@ http://localhost:8000/02-xxx/2-1.php
 ```
 
 つまり「ファイルを置いたパス」＝「URLのパス」（`study/`からの相対パス）とそのまま対応する。
+
+```mermaid
+graph LR
+    A["study/index.php"] --> A2["http://localhost:8000/index.php"]
+    B["study/01-basics/1-3.php"] --> B2["http://localhost:8000/01-basics/1-3.php"]
+    C["study/02-xxx/2-1.php"] --> C2["http://localhost:8000/02-xxx/2-1.php"]
+```
 
 ## サーバーの停止
 

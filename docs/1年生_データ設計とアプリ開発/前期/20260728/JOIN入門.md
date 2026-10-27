@@ -40,16 +40,24 @@ INNER JOIN orders ON users.id = orders.user_id;
 | 田中太郎 | ノートPC |
 | 鈴木花子 | キーボード |
 
-```
-INNER JOIN のイメージ(重なった部分だけが結果になる)
+INNER JOIN のイメージ(つながった組だけが結果になる)
 
-   users              orders
- ┌────────┐        ┌────────┐
- │        │████████│        │
- │  田中  │████████│ ノートPC│
- │  鈴木  │████████│キーボード│
- │  山田  │        │        │  ← 一致する orders がないので消える
- └────────┘        └────────┘
+```mermaid
+graph LR
+    subgraph users
+        U1[田中]
+        U2[鈴木]
+        U3[山田]
+    end
+    subgraph orders
+        O1[ノートPC]
+        O2[キーボード]
+    end
+    U1 --- O1
+    U2 --- O2
+    U3 -.- X["一致する orders がないので消える"]
+    style U3 stroke-dasharray: 5 5,color:#999
+    style X fill:none,stroke:none,color:#999
 ```
 
 山田次郎は`orders`に一致する行が1件もないため、**結果から消えます**。「両方のテーブルに存在するデータだけを結合する」とはこういう意味です。
@@ -70,15 +78,24 @@ LEFT JOIN orders ON users.id = orders.user_id;
 | 鈴木花子 | キーボード |
 | 山田次郎 | NULL    |
 
-```
 LEFT JOIN のイメージ(左テーブルは全員残す)
 
-   users              orders
- ┌────────┐        ┌────────┐
- │  田中  │████████│ ノートPC│
- │  鈴木  │████████│キーボード│
- │  山田  │ NULL   │        │  ← 一致がなくても行は残る(orders側はNULL埋め)
- └────────┘        └────────┘
+```mermaid
+graph LR
+    subgraph users
+        U1[田中]
+        U2[鈴木]
+        U3[山田]
+    end
+    subgraph orders
+        O1[ノートPC]
+        O2[キーボード]
+        N["NULL<br>一致がなくても行は残る<br>(orders側はNULL埋め)"]
+    end
+    U1 --- O1
+    U2 --- O2
+    U3 -.- N
+    style N stroke-dasharray: 5 5
 ```
 
 `FROM users LEFT JOIN orders`の**FROM側(左側)に書いたusersが基準**になります。山田次郎は注文がなくても行として残り、`orders`側の列は`NULL`(該当なし)で埋められます。

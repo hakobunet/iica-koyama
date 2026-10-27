@@ -159,6 +159,15 @@ jobs:
 > 「CI が ✅ のときだけ本番に出す」ようにしたいときは、Vercel の **Deployment Checks** という機能を使います。
 > プロジェクトの `Settings` の `Build and Deployment` にある Deployment Checks で `Add Checks` を押し、GitHub Actions のチェックを選びます（くわしくは [Vercel のドキュメント](https://vercel.com/docs/deployment-checks)）。
 
+CI と CD の関係を図にすると、次のようになります。
+
+```mermaid
+graph LR
+    A[git push] --> B[GitHub Actions<br>CI：lint・ビルドのチェック]
+    A --> C[Vercel<br>CD：ビルドして公開]
+    B -.->|Deployment Checks を<br>設定したときだけ<br>結果を待つ| C
+```
+
 > 💡 **README にバッジをはると、ポートフォリオでアピールできる**
 > `Actions` タブの workflow を開き、`Filter workflow runs` の横の `⋮` → `Create status badge` → `Copy status badge Markdown` でバッジのコードが作れます。
 > README にはると「CI/CD を使って開発している」ことが一目で伝わります。

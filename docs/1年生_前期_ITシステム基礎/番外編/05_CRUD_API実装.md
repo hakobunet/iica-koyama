@@ -112,6 +112,20 @@ def create_task(task_in: TaskCreate, db: Session = Depends(get_db)):
     return new_task
 ```
 
+POST /tasks が呼ばれたときの流れを図にすると、次のようになります。
+
+```mermaid
+sequenceDiagram
+    participant C as ブラウザ
+    participant A as create_task()
+    participant M as MySQL
+    C->>A: POST /tasks { "title": "買い物に行く" }
+    Note over A: TaskCreate で形式をチェック<br>Task(title=...) に変換
+    A->>M: db.add() → db.commit()（INSERT）
+    M-->>A: db.refresh() で id などを取得
+    A-->>C: TaskResponse の形で返す<br>{ "id": 1, "title": "買い物に行く", "done": false }
+```
+
 ---
 
 ### U — 完了切り替え（PUT /tasks/{task_id}）
@@ -220,7 +234,7 @@ touch routers/__init__.py
 uvicorn main:app --reload
 ```
 
-`http://localhost:8000/docs` を開いて確認する。
+`http://localhost:8000/docs` を開いて確認します。
 
 **確認手順（POST → GET → PUT → DELETE の順）：**
 

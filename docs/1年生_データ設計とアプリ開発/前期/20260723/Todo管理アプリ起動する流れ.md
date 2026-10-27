@@ -6,8 +6,8 @@
 
 ```mermaid
 graph LR
-    A[ブラウザ<br>localhost:8000/todo.php] -->|①アクセス| B[PHP開発サーバー<br>php -S localhost:8000]
-    B -->|②SQLを実行| C[MySQLサーバー<br>127.0.0.1:3306<br>XAMPPで起動]
+    A["ブラウザ<br>localhost:8000/todo.php"] -->|①アクセス| B["PHP開発サーバー<br>php -S localhost:8000"]
+    B -->|②SQLを実行| C["MySQLサーバー<br>127.0.0.1:3306<br>XAMPPで起動"]
     C -->|③結果を返す| B
     B -->|④HTMLを返す| A
     C --- D[(school_db<br>todosテーブル)]
@@ -103,6 +103,19 @@ TODOアプリの画面が表示されれば起動成功です。
 - 「削除」→ 確認ダイアログのあと削除されるか
 
 すべて反映された状態で `index.php`（＝`todo.php`）に戻ってくれば正常に動作しています（PRGパターンにより、操作後は自動でページが再読み込みされる仕組み）。
+
+PRG（Post → Redirect → Get）パターンの流れは次のとおりです。
+
+```mermaid
+sequenceDiagram
+    participant B as ブラウザ
+    participant P as todo.php
+    B->>P: ① POST（追加・編集・削除など）
+    Note over P: データベースを更新
+    P-->>B: ② リダイレクト（もう一度開いて）
+    B->>P: ③ GET（ページを開き直す）
+    P-->>B: 最新の一覧を表示
+```
 
 ---
 
