@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>タスク管理アプリ</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #f5f5f5;
+    }
+    h1 { color: #333; }
+    .add-form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .add-form input {
+      flex: 1;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .add-form button {
+      padding: 8px 16px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .task-list { list-style: none; padding: 0; }
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .task-title { flex: 1; font-size: 16px; }
+    .task-title.done { text-decoration: line-through; color: #999; }
+    .btn-done {
+      padding: 4px 12px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-delete {
+      padding: 4px 12px;
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>タスク管理アプリ</h1>
+  <div class="add-form">
+    <input type="text" id="newTaskInput" placeholder="新しいタスクを入力...">
+    <button onclick="addTask()">追加</button>
+  </div>
+  <ul class="task-list" id="taskList"></ul>
+
+  <script>
+    const API_URL = "http://localhost:8000";
+
+    async function loadTasks() {
+      const response = await fetch(`${API_URL}/tasks`);
+      const tasks = await response.json();
+      const taskList = document.getElementById("taskList");
+      taskList.innerHTML = "";
+      tasks.forEach(task => {
+        const li = document.createElement("li");
+        li.className = "task-item";
+        li.innerHTML = `
+          <span class="task-title ${task.done ? 'done' : ''}">${task.title}</span>
+          <button class="btn-done" onclick="toggleTask(${task.id})">
+            ${task.done ? '未完了に戻す' : '完了'}
+          </button>
+          <button class="btn-delete" onclick="deleteTask(${task.id})">削除</button>
+        `;
+        taskList.appendChild(li);
+      });
+    }
+
+    async function addTask() {
+      const input = document.getElementById("newTaskInput");
+      const title = input.value.trim();
+      if (!title) return;
+      await fetch(`${API_URL}/tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title })
+      });
+      input.value = "";
+      loadTasks();
+    }
+
+    async function toggleTask(taskId) {
+      await fetch(`${API_URL}/tasks/${taskId}`, { method: "PUT" });
+      loadTasks();
+    }
+
+    async function deleteTask(taskId) {
+      await fetch(`${API_URL}/tasks/${taskId}`, { method: "DELETE" });
+      loadTasks();
+    }
+
+    document.getElementById("newTaskInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") addTask();
+    });
+
+    loadTasks();
+  </script>
+</body>
+</html>
